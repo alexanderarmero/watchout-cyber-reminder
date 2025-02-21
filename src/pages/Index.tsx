@@ -6,6 +6,8 @@ import { getReminders, addReminder, deleteReminder } from "@/utils/reminderUtils
 import { Reminder } from "@/types/reminder";
 import { useToast } from "@/components/ui/use-toast";
 import notificationService from "@/utils/notificationService";
+import { Button } from "@/components/ui/button";
+import { Download } from "lucide-react";
 
 const Index = () => {
   const [reminders, setReminders] = useState<Reminder[]>([]);
@@ -41,6 +43,39 @@ const Index = () => {
     toast({
       title: "Reminder deleted",
       description: "The reminder has been removed successfully.",
+    });
+  };
+
+  const handleDownload = () => {
+    // Open system selection dialog
+    toast({
+      title: "Download Options",
+      description: "Select your operating system:",
+      action: (
+        <div className="flex gap-2 mt-2">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => window.open("https://github.com/YOUR_REPO/releases/latest/download/Reminders.dmg")}
+          >
+            macOS
+          </Button>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => window.open("https://github.com/YOUR_REPO/releases/latest/download/Reminders.exe")}
+          >
+            Windows
+          </Button>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => window.open("https://github.com/YOUR_REPO/releases/latest/download/Reminders.AppImage")}
+          >
+            Linux
+          </Button>
+        </div>
+      ),
     });
   };
 
@@ -99,6 +134,17 @@ const Index = () => {
             Design personalized notifications that help you maintain efficiency and avoid 
             distractions in your workflow.
           </p>
+          
+          {/* Download Button */}
+          <div className="pt-4">
+            <Button 
+              onClick={handleDownload}
+              className="bg-gradient-to-r from-cyberpunk-purple to-cyberpunk-accent hover:opacity-90 text-white"
+            >
+              <Download className="mr-2 h-4 w-4" />
+              Download Desktop App
+            </Button>
+          </div>
         </section>
 
         {/* Main Content */}
