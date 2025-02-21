@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { ReminderCard } from "@/components/ReminderCard";
 import { NewReminderForm } from "@/components/NewReminderForm";
@@ -7,7 +6,7 @@ import { Reminder } from "@/types/reminder";
 import { useToast } from "@/components/ui/use-toast";
 import notificationService from "@/utils/notificationService";
 import { Button } from "@/components/ui/button";
-import { Download } from "lucide-react";
+import { Github } from "lucide-react";
 
 const Index = () => {
   const [reminders, setReminders] = useState<Reminder[]>([]);
@@ -46,37 +45,8 @@ const Index = () => {
     });
   };
 
-  const handleDownload = () => {
-    // Open system selection dialog
-    toast({
-      title: "Download Options",
-      description: "Select your operating system:",
-      action: (
-        <div className="flex gap-2 mt-2">
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => window.open("https://github.com/YOUR_REPO/releases/latest/download/Reminders.dmg")}
-          >
-            macOS
-          </Button>
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => window.open("https://github.com/YOUR_REPO/releases/latest/download/Reminders.exe")}
-          >
-            Windows
-          </Button>
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => window.open("https://github.com/YOUR_REPO/releases/latest/download/Reminders.AppImage")}
-          >
-            Linux
-          </Button>
-        </div>
-      ),
-    });
+  const handleGithubRedirect = () => {
+    window.open("https://github.com/YOUR_USERNAME/YOUR_REPO", "_blank");
   };
 
   return (
@@ -135,14 +105,14 @@ const Index = () => {
             distractions in your workflow.
           </p>
           
-          {/* Download Button */}
+          {/* Github Button */}
           <div className="pt-4">
             <Button 
-              onClick={handleDownload}
+              onClick={handleGithubRedirect}
               className="bg-gradient-to-r from-cyberpunk-purple to-cyberpunk-accent hover:opacity-90 text-white"
             >
-              <Download className="mr-2 h-4 w-4" />
-              Download Desktop App
+              <Github className="mr-2 h-4 w-4" />
+              View on GitHub
             </Button>
           </div>
         </section>
