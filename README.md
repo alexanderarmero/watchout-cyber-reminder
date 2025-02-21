@@ -1,3 +1,4 @@
+
 # Welcome to your Lovable project
 
 ## Project info
@@ -36,29 +37,79 @@ npm i
 npm run dev
 ```
 
-**Edit a file directly in GitHub**
+## Building the Desktop Application
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+This project can be built as a desktop application for macOS, Windows, and Linux using Electron.
 
-**Use GitHub Codespaces**
+### Prerequisites
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+- Node.js and npm installed
+- For macOS builds: A Mac computer
+- For Windows builds: A Windows computer (or using virtual machine/cross-compilation)
+- For Linux builds: A Linux system (or using virtual machine/cross-compilation)
+
+### Development
+
+To run the app in development mode:
+
+```sh
+# First terminal: Start the Vite dev server
+npm run dev
+
+# Second terminal: Start Electron
+npm run electron:dev
+```
+
+### Building the Desktop App
+
+To build the desktop application:
+
+```sh
+# Build for your current platform
+npm run electron:build
+
+# Build for specific platforms (on macOS)
+npm run electron:build -- --mac
+npm run electron:build -- --win
+npm run electron:build -- --linux
+```
+
+The built applications will be available in the `release` directory:
+- macOS: `.dmg` and `.zip` files
+- Windows: `.exe` installer
+- Linux: `.AppImage` file
+
+### Running the Built App
+
+#### macOS
+1. Navigate to the `release` directory
+2. Find the `.dmg` file
+3. Double click to mount the disk image
+4. Drag the app to your Applications folder
+5. If you get a security warning, go to System Preferences > Security & Privacy > General and click "Open Anyway"
+
+#### Windows
+1. Navigate to the `release` directory
+2. Find the `.exe` installer
+3. Run the installer
+4. Follow the installation wizard
+
+#### Linux
+1. Navigate to the `release` directory
+2. Find the `.AppImage` file
+3. Make it executable: `chmod +x <filename>.AppImage`
+4. Run it: `./<filename>.AppImage`
 
 ## What technologies are used for this project?
 
-This project is built with .
+This project is built with:
 
 - Vite
 - TypeScript
 - React
 - shadcn-ui
 - Tailwind CSS
+- Electron
 
 ## How can I deploy this project?
 
