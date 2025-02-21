@@ -9,7 +9,7 @@ interface ReminderCardProps extends Reminder {
 
 export const ReminderCard = ({ id, title, description, frequency, onDelete }: ReminderCardProps) => {
   return (
-    <Card className="bg-cyberpunk-dark/80 border border-cyberpunk-purple/20 hover:border-cyberpunk-purple/40 transition-all duration-300 backdrop-blur-sm animate-fadeIn">
+    <Card className="bg-cyberpunk-dark/80 border-2 border-black hover:border-cyberpunk-purple/40 transition-all duration-300 backdrop-blur-sm animate-fadeIn">
       <CardHeader>
         <div className="flex items-center justify-between">
           <CardTitle className="text-lg font-semibold text-white flex items-center gap-2">

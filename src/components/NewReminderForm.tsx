@@ -48,7 +48,7 @@ export const NewReminderForm = ({ onSubmit }: NewReminderFormProps) => {
   };
 
   return (
-    <Card className="bg-cyberpunk-dark/80 border border-cyberpunk-purple/20 backdrop-blur-sm">
+    <Card className="bg-cyberpunk-dark/80 border-2 border-black backdrop-blur-sm">
       <CardHeader>
         <CardTitle className="text-xl font-semibold text-white">Create New Reminder</CardTitle>
       </CardHeader>
@@ -60,7 +60,7 @@ export const NewReminderForm = ({ onSubmit }: NewReminderFormProps) => {
               id="title"
               value={title}
               onChange={(e) => setTitle(e.target.value)}
-              className="bg-cyberpunk-dark/60 border-cyberpunk-purple/30 text-white"
+              className="bg-cyberpunk-dark/60 border-black border-2 text-white"
               placeholder="Enter reminder title"
             />
           </div>
@@ -71,7 +71,7 @@ export const NewReminderForm = ({ onSubmit }: NewReminderFormProps) => {
               id="description"
               value={description}
               onChange={(e) => setDescription(e.target.value)}
-              className="bg-cyberpunk-dark/60 border-cyberpunk-purple/30 text-white"
+              className="bg-cyberpunk-dark/60 border-black border-2 text-white"
               placeholder="Enter reminder description"
             />
           </div>
@@ -79,10 +79,10 @@ export const NewReminderForm = ({ onSubmit }: NewReminderFormProps) => {
           <div className="space-y-2">
             <Label htmlFor="frequency" className="text-white">Frequency</Label>
             <Select onValueChange={setFrequency} value={frequency}>
-              <SelectTrigger className="bg-cyberpunk-dark/60 border-cyberpunk-purple/30 text-white">
+              <SelectTrigger className="bg-cyberpunk-dark/60 border-black border-2 text-white">
                 <SelectValue placeholder="Select frequency" />
               </SelectTrigger>
-              <SelectContent className="bg-cyberpunk-dark border-cyberpunk-purple/30">
+              <SelectContent className="bg-cyberpunk-dark border-black border-2">
                 {FREQUENCY_OPTIONS.map((option) => (
                   <SelectItem
                     key={option.value}
@@ -104,7 +104,7 @@ export const NewReminderForm = ({ onSubmit }: NewReminderFormProps) => {
                 type="datetime-local"
                 value={customDateTime}
                 onChange={(e) => setCustomDateTime(e.target.value)}
-                className="bg-cyberpunk-dark/60 border-cyberpunk-purple/30 text-white"
+                className="bg-cyberpunk-dark/60 border-black border-2 text-white"
                 min={new Date().toISOString().slice(0, 16)}
               />
             </div>
