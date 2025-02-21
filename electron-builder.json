@@ -1,0 +1,25 @@
+
+{
+  "appId": "com.reminders.app",
+  "productName": "Reminders",
+  "directories": {
+    "output": "release/"
+  },
+  "files": [
+    "dist/**/*",
+    "electron/**/*"
+  ],
+  "mac": {
+    "category": "public.app-category.productivity",
+    "target": ["dmg", "zip"],
+    "icon": "public/favicon.ico"
+  },
+  "win": {
+    "target": ["nsis"],
+    "icon": "public/favicon.ico"
+  },
+  "linux": {
+    "target": ["AppImage"],
+    "icon": "public/favicon.ico"
+  }
+}
