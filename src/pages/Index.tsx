@@ -5,18 +5,32 @@ import { NewReminderForm } from "@/components/NewReminderForm";
 import { getReminders, addReminder, deleteReminder } from "@/utils/reminderUtils";
 import { Reminder } from "@/types/reminder";
 import { useToast } from "@/components/ui/use-toast";
+import notificationService from "@/utils/notificationService";
 
 const Index = () => {
   const [reminders, setReminders] = useState<Reminder[]>([]);
   const { toast } = useToast();
 
+  // Initialize notifications for existing reminders
   useEffect(() => {
-    setReminders(getReminders());
+    const loadedReminders = getReminders();
+    setReminders(loadedReminders);
+    
+    // Schedule notifications for all existing reminders
+    loadedReminders.forEach(reminder => {
+      notificationService.scheduleNotification(reminder);
+    });
+
+    // Cleanup on unmount
+    return () => {
+      notificationService.clearAllNotifications();
+    };
   }, []);
 
   const handleAddReminder = async (data: { title: string; description: string; frequency: Reminder["frequency"] }) => {
     const newReminder = await addReminder(data);
     setReminders((prev) => [...prev, newReminder]);
+    notificationService.scheduleNotification(newReminder);
     toast({
       title: "Reminder created",
       description: "Your new reminder has been added successfully.",
@@ -25,6 +39,7 @@ const Index = () => {
 
   const handleDeleteReminder = async (id: string) => {
     await deleteReminder(id);
+    notificationService.clearNotification(id);
     setReminders((prev) => prev.filter((reminder) => reminder.id !== id));
     toast({
       title: "Reminder deleted",
