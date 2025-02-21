@@ -30,19 +30,19 @@ class NotificationService {
 
     switch (value) {
       case "30min":
-        milliseconds = 30 * 60 * 1000;
+        milliseconds = 30 * 1000; // Changed to 30 seconds for testing
         break;
       case "1h":
-        milliseconds = 60 * 60 * 1000;
+        milliseconds = 60 * 1000; // Changed to 1 minute for testing
         break;
       case "12h":
-        milliseconds = 12 * 60 * 60 * 1000;
+        milliseconds = 120 * 1000; // Changed to 2 minutes for testing
         break;
       case "24h":
-        milliseconds = 24 * 60 * 60 * 1000;
+        milliseconds = 180 * 1000; // Changed to 3 minutes for testing
         break;
       default:
-        milliseconds = 30 * 60 * 1000; // Default to 30 minutes
+        milliseconds = 30 * 1000; // Default to 30 seconds
     }
 
     return milliseconds;
