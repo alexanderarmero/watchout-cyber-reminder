@@ -5,24 +5,42 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { FrequencyType } from "@/types/reminder";
 
-const FREQUENCY_OPTIONS = [
-  { value: "30min", label: "Every 30 minutes" },
-  { value: "1h", label: "Every hour" },
-  { value: "12h", label: "Every 12 hours" },
-  { value: "24h", label: "Daily" },
-  { value: "custom", label: "Custom time" },
+const FREQUENCY_OPTIONS: { value: string; label: string; type: 'recurring' | 'oneTime' }[] = [
+  { value: "30min", label: "Every 30 minutes", type: "recurring" },
+  { value: "1h", label: "Every hour", type: "recurring" },
+  { value: "12h", label: "Every 12 hours", type: "recurring" },
+  { value: "24h", label: "Daily", type: "recurring" },
+  { value: "custom", label: "Custom time", type: "oneTime" },
 ];
 
-export const NewReminderForm = () => {
+interface NewReminderFormProps {
+  onSubmit: (data: { title: string; description: string; frequency: FrequencyType }) => void;
+}
+
+export const NewReminderForm = ({ onSubmit }: NewReminderFormProps) => {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [frequency, setFrequency] = useState("");
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    // Handle form submission here
-    console.log({ title, description, frequency });
+    const selectedFrequency = FREQUENCY_OPTIONS.find((option) => option.value === frequency);
+    if (selectedFrequency && title && description) {
+      onSubmit({
+        title,
+        description,
+        frequency: {
+          type: selectedFrequency.type,
+          value: selectedFrequency.value,
+          label: selectedFrequency.label,
+        },
+      });
+      setTitle("");
+      setDescription("");
+      setFrequency("");
+    }
   };
 
   return (

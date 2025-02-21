@@ -1,22 +1,37 @@
 
+import { useState, useEffect } from "react";
 import { ReminderCard } from "@/components/ReminderCard";
 import { NewReminderForm } from "@/components/NewReminderForm";
-
-// Example reminders (will be replaced with real data later)
-const EXAMPLE_REMINDERS = [
-  {
-    title: "Take a Break",
-    description: "Step away from AI tools and solve the problem with your expertise",
-    frequency: "Every 30 minutes",
-  },
-  {
-    title: "Code Review",
-    description: "Review your recent code changes with a fresh perspective",
-    frequency: "Daily",
-  },
-];
+import { getReminders, addReminder, deleteReminder } from "@/utils/reminderUtils";
+import { Reminder } from "@/types/reminder";
+import { useToast } from "@/components/ui/use-toast";
 
 const Index = () => {
+  const [reminders, setReminders] = useState<Reminder[]>([]);
+  const { toast } = useToast();
+
+  useEffect(() => {
+    setReminders(getReminders());
+  }, []);
+
+  const handleAddReminder = async (data: { title: string; description: string; frequency: Reminder["frequency"] }) => {
+    const newReminder = await addReminder(data);
+    setReminders((prev) => [...prev, newReminder]);
+    toast({
+      title: "Reminder created",
+      description: "Your new reminder has been added successfully.",
+    });
+  };
+
+  const handleDeleteReminder = async (id: string) => {
+    await deleteReminder(id);
+    setReminders((prev) => prev.filter((reminder) => reminder.id !== id));
+    toast({
+      title: "Reminder deleted",
+      description: "The reminder has been removed successfully.",
+    });
+  };
+
   return (
     <div className="min-h-screen bg-cyberpunk-dark text-white p-6 md:p-8">
       <div className="max-w-7xl mx-auto space-y-12">
@@ -38,15 +53,19 @@ const Index = () => {
           <section className="space-y-6">
             <h2 className="text-2xl font-semibold">Your Reminders</h2>
             <div className="space-y-4">
-              {EXAMPLE_REMINDERS.map((reminder, index) => (
-                <ReminderCard key={index} {...reminder} />
+              {reminders.map((reminder) => (
+                <ReminderCard 
+                  key={reminder.id} 
+                  {...reminder} 
+                  onDelete={handleDeleteReminder}
+                />
               ))}
             </div>
           </section>
 
           {/* New Reminder Form */}
           <section>
-            <NewReminderForm />
+            <NewReminderForm onSubmit={handleAddReminder} />
           </section>
         </div>
       </div>

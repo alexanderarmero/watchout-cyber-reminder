@@ -1,0 +1,27 @@
+
+{
+  "reminders": [
+    {
+      "id": "1",
+      "title": "Take a Break",
+      "description": "Step away from AI tools and solve the problem with your expertise",
+      "frequency": {
+        "type": "recurring",
+        "value": "30min",
+        "label": "Every 30 minutes"
+      },
+      "createdAt": "2024-03-20T10:00:00.000Z"
+    },
+    {
+      "id": "2",
+      "title": "Code Review",
+      "description": "Review your recent code changes with a fresh perspective",
+      "frequency": {
+        "type": "recurring",
+        "value": "24h",
+        "label": "Daily"
+      },
+      "createdAt": "2024-03-20T10:00:00.000Z"
+    }
+  ]
+}

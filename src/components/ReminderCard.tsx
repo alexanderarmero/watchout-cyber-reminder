@@ -1,14 +1,13 @@
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Bell, Clock } from "lucide-react";
+import { Bell, Clock, Trash2 } from "lucide-react";
+import { Reminder } from "@/types/reminder";
 
-interface ReminderCardProps {
-  title: string;
-  description: string;
-  frequency: string;
+interface ReminderCardProps extends Reminder {
+  onDelete: (id: string) => void;
 }
 
-export const ReminderCard = ({ title, description, frequency }: ReminderCardProps) => {
+export const ReminderCard = ({ id, title, description, frequency, onDelete }: ReminderCardProps) => {
   return (
     <Card className="bg-cyberpunk-dark border border-cyberpunk-purple/20 hover:border-cyberpunk-purple/40 transition-all duration-300 backdrop-blur-sm animate-fadeIn">
       <CardHeader>
@@ -17,9 +16,17 @@ export const ReminderCard = ({ title, description, frequency }: ReminderCardProp
             <Bell className="w-4 h-4 text-cyberpunk-accent animate-glow" />
             {title}
           </CardTitle>
-          <div className="flex items-center gap-2 text-cyberpunk-muted">
-            <Clock className="w-4 h-4" />
-            <span className="text-sm">{frequency}</span>
+          <div className="flex items-center gap-4">
+            <div className="flex items-center gap-2 text-cyberpunk-muted">
+              <Clock className="w-4 h-4" />
+              <span className="text-sm">{frequency.label}</span>
+            </div>
+            <button 
+              onClick={() => onDelete(id)}
+              className="text-cyberpunk-muted hover:text-red-400 transition-colors"
+            >
+              <Trash2 className="w-4 h-4" />
+            </button>
           </div>
         </div>
       </CardHeader>
