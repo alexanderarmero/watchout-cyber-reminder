@@ -1,9 +1,34 @@
 
 import { Reminder } from "@/types/reminder";
-import remindersData from "@/data/reminders.json";
+
+// In-memory storage for reminders
+let reminders: Reminder[] = [
+  {
+    id: "1",
+    title: "Take a Break",
+    description: "Step away from AI tools and solve the problem with your expertise",
+    frequency: {
+      type: "recurring",
+      value: "30min",
+      label: "Every 30 minutes"
+    },
+    createdAt: "2024-03-20T10:00:00.000Z"
+  },
+  {
+    id: "2",
+    title: "Code Review",
+    description: "Review your recent code changes with a fresh perspective",
+    frequency: {
+      type: "recurring",
+      value: "24h",
+      label: "Daily"
+    },
+    createdAt: "2024-03-20T10:00:00.000Z"
+  }
+];
 
 export const getReminders = (): Reminder[] => {
-  return remindersData.reminders;
+  return reminders;
 };
 
 export const addReminder = async (reminder: Omit<Reminder, "id" | "createdAt">) => {
@@ -13,13 +38,10 @@ export const addReminder = async (reminder: Omit<Reminder, "id" | "createdAt">) 
     createdAt: new Date().toISOString(),
   };
   
-  remindersData.reminders.push(newReminder);
+  reminders = [...reminders, newReminder];
   return newReminder;
 };
 
 export const deleteReminder = async (id: string) => {
-  const index = remindersData.reminders.findIndex((reminder) => reminder.id === id);
-  if (index !== -1) {
-    remindersData.reminders.splice(index, 1);
-  }
+  reminders = reminders.filter(reminder => reminder.id !== id);
 };
