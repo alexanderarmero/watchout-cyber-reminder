@@ -47,6 +47,14 @@ export const NewReminderForm = ({ onSubmit }: NewReminderFormProps) => {
     }
   };
 
+  const isFormValid = () => {
+    if (!title || !description || !frequency) return false;
+    if (frequency === "custom") {
+      return !!customDateTime;
+    }
+    return true;
+  };
+
   return (
     <Card className="bg-cyberpunk-dark/80 border-2 border-black backdrop-blur-sm">
       <CardHeader>
@@ -113,7 +121,7 @@ export const NewReminderForm = ({ onSubmit }: NewReminderFormProps) => {
           <Button
             type="submit"
             className="w-full bg-cyberpunk-purple hover:bg-cyberpunk-purple/90 text-white"
-            disabled={!title || !description || !frequency || (frequency === "custom" && !customDateTime)}
+            disabled={!isFormValid()}
           >
             Create Reminder
           </Button>
