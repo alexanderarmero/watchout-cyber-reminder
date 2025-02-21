@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { ReminderCard } from "@/components/ReminderCard";
 import { NewReminderForm } from "@/components/NewReminderForm";
@@ -46,7 +47,7 @@ const Index = () => {
   };
 
   const handleGithubRedirect = () => {
-    window.open("https://github.com/YOUR_USERNAME/YOUR_REPO", "_blank");
+    window.open("https://github.com/alexanderarmero/watchout-cyber-reminder", "_blank");
   };
 
   return (
