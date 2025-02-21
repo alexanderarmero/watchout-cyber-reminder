@@ -30,19 +30,19 @@ class NotificationService {
 
     switch (value) {
       case "30min":
-        milliseconds = 30 * 1000; // Changed to 30 seconds for testing
+        milliseconds = 30 * 60 * 1000; // 30 minutes
         break;
       case "1h":
-        milliseconds = 60 * 1000; // Changed to 1 minute for testing
+        milliseconds = 60 * 60 * 1000; // 1 hour
         break;
       case "12h":
-        milliseconds = 120 * 1000; // Changed to 2 minutes for testing
+        milliseconds = 12 * 60 * 60 * 1000; // 12 hours
         break;
       case "24h":
-        milliseconds = 180 * 1000; // Changed to 3 minutes for testing
+        milliseconds = 24 * 60 * 60 * 1000; // 24 hours
         break;
       default:
-        milliseconds = 30 * 1000; // Default to 30 seconds
+        milliseconds = 30 * 60 * 1000; // Default to 30 minutes
     }
 
     return milliseconds;
@@ -50,16 +50,21 @@ class NotificationService {
 
   private showNotification(reminder: Reminder) {
     if (Notification.permission === "granted") {
+      console.log(`Showing notification for reminder: ${reminder.title}`);
       new Notification(reminder.title, {
         body: reminder.description,
-        icon: "/favicon.ico", // You can customize this
-        silent: false
+        icon: "/favicon.ico",
+        silent: false,
+        requireInteraction: true // Makes the notification stay until user interacts with it
       });
 
       // If it's a recurring reminder, schedule the next one
       if (reminder.frequency.type === "recurring") {
+        console.log(`Scheduling next notification for recurring reminder: ${reminder.title}`);
         this.scheduleNotification(reminder);
       }
+    } else {
+      console.warn("Notification permission not granted");
     }
   }
 
@@ -70,6 +75,14 @@ class NotificationService {
     }
 
     const delay = this.calculateNextTrigger(reminder.frequency);
+    console.log(`Scheduling notification for "${reminder.title}" in ${delay/1000} seconds`);
+
+    // Don't schedule if delay is negative (past time for one-time reminders)
+    if (delay < 0 && reminder.frequency.type === "oneTime") {
+      console.warn(`Skipping past-due one-time reminder: ${reminder.title}`);
+      return;
+    }
+
     const timeout = setTimeout(() => {
       this.showNotification(reminder);
     }, delay);
