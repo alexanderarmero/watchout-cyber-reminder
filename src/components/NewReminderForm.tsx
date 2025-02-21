@@ -23,6 +23,7 @@ export const NewReminderForm = ({ onSubmit }: NewReminderFormProps) => {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [frequency, setFrequency] = useState("");
+  const [customDateTime, setCustomDateTime] = useState("");
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -33,13 +34,16 @@ export const NewReminderForm = ({ onSubmit }: NewReminderFormProps) => {
         description,
         frequency: {
           type: selectedFrequency.type,
-          value: selectedFrequency.value,
-          label: selectedFrequency.label,
+          value: selectedFrequency.type === "oneTime" ? customDateTime : selectedFrequency.value,
+          label: selectedFrequency.type === "oneTime" 
+            ? `One time at ${new Date(customDateTime).toLocaleString()}`
+            : selectedFrequency.label,
         },
       });
       setTitle("");
       setDescription("");
       setFrequency("");
+      setCustomDateTime("");
     }
   };
 
@@ -92,9 +96,24 @@ export const NewReminderForm = ({ onSubmit }: NewReminderFormProps) => {
             </Select>
           </div>
 
+          {frequency === "custom" && (
+            <div className="space-y-2">
+              <Label htmlFor="customDateTime" className="text-white">Reminder Date & Time</Label>
+              <Input
+                id="customDateTime"
+                type="datetime-local"
+                value={customDateTime}
+                onChange={(e) => setCustomDateTime(e.target.value)}
+                className="bg-cyberpunk-dark border-cyberpunk-purple/30 text-white"
+                min={new Date().toISOString().slice(0, 16)}
+              />
+            </div>
+          )}
+
           <Button
             type="submit"
             className="w-full bg-cyberpunk-purple hover:bg-cyberpunk-purple/90 text-white"
+            disabled={!title || !description || !frequency || (frequency === "custom" && !customDateTime)}
           >
             Create Reminder
           </Button>
