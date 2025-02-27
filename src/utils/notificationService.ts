@@ -100,12 +100,19 @@ class NotificationService {
     if (this.timeouts.has(reminderId)) {
       clearTimeout(this.timeouts.get(reminderId));
       this.timeouts.delete(reminderId);
+      console.log(`Cleared notification for reminder ID: ${reminderId}`);
     }
   }
 
   clearAllNotifications() {
     this.timeouts.forEach(timeout => clearTimeout(timeout));
     this.timeouts.clear();
+    console.log("Cleared all notifications");
+  }
+  
+  // Return all active notification IDs (for debugging)
+  getActiveNotificationIds() {
+    return Array.from(this.timeouts.keys());
   }
 }
 

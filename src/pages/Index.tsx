@@ -25,15 +25,23 @@ const Index = () => {
   const { toast } = useToast();
 
   useEffect(() => {
+    // Load reminders from storage
     const loadedReminders = getReminders();
     setReminders(loadedReminders);
     
+    // Load saved reminders from storage
     const loadedSavedReminders = getReminderLibrary();
     setSavedReminders(loadedSavedReminders);
     
+    // Clear any existing notifications first to prevent duplicates
+    notificationService.clearAllNotifications();
+    
+    // Then schedule notifications for all active reminders
     loadedReminders.forEach(reminder => {
       notificationService.scheduleNotification(reminder);
     });
+    
+    console.log(`Loaded ${loadedReminders.length} active reminders and ${loadedSavedReminders.length} saved reminders`);
 
     return () => {
       notificationService.clearAllNotifications();
@@ -51,13 +59,22 @@ const Index = () => {
   };
 
   const handleDeleteReminder = async (id: string) => {
-    await deleteReminder(id);
+    // First clear the notification
     notificationService.clearNotification(id);
+    
+    // Then delete the reminder
+    await deleteReminder(id);
+    
+    // Update the UI
     setReminders((prev) => prev.filter((reminder) => reminder.id !== id));
+    
     toast({
       title: "Reminder deleted",
       description: "The reminder has been removed successfully.",
     });
+    
+    console.log(`Deleted reminder ID: ${id}`);
+    console.log(`Active notifications after deletion: ${notificationService.getActiveNotificationIds().join(', ')}`);
   };
 
   const handleSaveToLibrary = async (id: string) => {
@@ -107,6 +124,9 @@ const Index = () => {
       title: "Reminder activated",
       description: "The saved reminder has been activated and scheduled.",
     });
+    
+    console.log(`Activated reminder: ${reminder.id} - ${reminder.title}`);
+    console.log(`Active notifications: ${notificationService.getActiveNotificationIds().join(', ')}`);
   };
 
   const handleGithubRedirect = () => {

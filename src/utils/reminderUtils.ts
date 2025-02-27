@@ -95,8 +95,13 @@ export const addReminder = async (reminder: Omit<Reminder, "id" | "createdAt">) 
 };
 
 export const deleteReminder = async (id: string) => {
+  // Make sure the reminder is fully removed from memory
   reminders = reminders.filter(reminder => reminder.id !== id);
+  
+  // Make sure to save the updated reminders to localStorage
   saveRemindersToStorage(reminders);
+  
+  console.log(`Deleted reminder ID: ${id}, remaining reminders: ${reminders.length}`);
 };
 
 export const saveReminderToLibrary = async (reminderId: string) => {
