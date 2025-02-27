@@ -1,0 +1,23 @@
+
+appId: com.watchout.cyber-reminder
+productName: WatchOut Cyber Reminder
+directories:
+  output: release/
+  buildResources: resources/
+files:
+  - dist/
+  - package.json
+mac:
+  category: public.app-category.productivity
+  target:
+    - dmg
+    - zip
+  icon: public/favicon.ico
+win:
+  target:
+    - nsis
+  icon: public/favicon.ico
+linux:
+  target:
+    - AppImage
+  icon: public/favicon.ico

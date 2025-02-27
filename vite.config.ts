@@ -1,27 +1,20 @@
 
-import { defineConfig } from "vite";
-import react from "@vitejs/plugin-react-swc";
-import path from "path";
-import { componentTagger } from "lovable-tagger";
+import { defineConfig } from 'vite'
+import react from '@vitejs/plugin-react'
+import path from 'path'
 
-export default defineConfig(({ mode }) => ({
-  server: {
-    host: "::",
-    port: 8080,
-  },
-  plugins: [
-    react(),
-    mode === 'development' &&
-    componentTagger(),
-  ].filter(Boolean),
+// https://vitejs.dev/config/
+export default defineConfig({
+  plugins: [react()],
   resolve: {
     alias: {
-      "@": path.resolve(__dirname, "./src"),
+      '@': path.resolve(__dirname, './src'),
     },
   },
-  base: './',
-  build: {
-    outDir: 'dist',
-    emptyOutDir: true,
+  // Ensure proper base path for Electron
+  base: process.env.ELECTRON === 'true' ? './' : '/',
+  // Don't open browser when running dev server
+  server: {
+    open: false
   }
-}));
+})
