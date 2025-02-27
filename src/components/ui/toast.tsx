@@ -2,7 +2,7 @@
 import * as React from "react"
 import * as ToastPrimitives from "@radix-ui/react-toast"
 import { cva, type VariantProps } from "class-variance-authority"
-import { X, Zen } from "lucide-react"
+import { X, Bell } from "lucide-react"
 
 import { cn } from "@/lib/utils"
 
@@ -92,7 +92,7 @@ const ToastTitle = React.forwardRef<
   React.ComponentPropsWithoutRef<typeof ToastPrimitives.Title>
 >(({ className, ...props }, ref) => (
   <div className="flex items-center space-x-2">
-    <Zen className="h-5 w-5 text-[#F97316]" />
+    <Bell className="h-5 w-5 text-[#F97316]" />
     <ToastPrimitives.Title
       ref={ref}
       className={cn("text-sm font-semibold", className)}
