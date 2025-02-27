@@ -8,6 +8,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { FrequencyType } from "@/types/reminder";
 
 const FREQUENCY_OPTIONS: { value: string; label: string; type: 'recurring' | 'oneTime' }[] = [
+  { value: "30s", label: "Every 30 seconds", type: "recurring" },
+  { value: "60s", label: "Every 60 seconds", type: "recurring" },
   { value: "30min", label: "Every 30 minutes", type: "recurring" },
   { value: "1h", label: "Every hour", type: "recurring" },
   { value: "12h", label: "Every 12 hours", type: "recurring" },

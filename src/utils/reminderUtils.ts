@@ -9,8 +9,8 @@ let reminders: Reminder[] = [
     description: "Step away from AI tools and solve the problem with your expertise",
     frequency: {
       type: "recurring",
-      value: "30min",
-      label: "Every 30 minutes"
+      value: "30s",
+      label: "Every 30 seconds"
     },
     createdAt: "2024-03-20T10:00:00.000Z"
   },
@@ -20,8 +20,8 @@ let reminders: Reminder[] = [
     description: "Review your recent code changes with a fresh perspective",
     frequency: {
       type: "recurring",
-      value: "24h",
-      label: "Daily"
+      value: "60s",
+      label: "Every 60 seconds"
     },
     createdAt: "2024-03-20T10:00:00.000Z"
   }

@@ -29,6 +29,12 @@ class NotificationService {
     let milliseconds = 0;
 
     switch (value) {
+      case "30s":
+        milliseconds = 30 * 1000; // 30 seconds
+        break;
+      case "60s":
+        milliseconds = 60 * 1000; // 60 seconds
+        break;
       case "30min":
         milliseconds = 30 * 60 * 1000; // 30 minutes
         break;
@@ -42,7 +48,7 @@ class NotificationService {
         milliseconds = 24 * 60 * 60 * 1000; // 24 hours
         break;
       default:
-        milliseconds = 30 * 60 * 1000; // Default to 30 minutes
+        milliseconds = 30 * 1000; // Default to 30 seconds for testing
     }
 
     return milliseconds;
