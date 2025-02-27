@@ -45,9 +45,12 @@ async function startElectron() {
 async function startVite() {
   const server = await createServer({
     configFile: path.join(__dirname, '../vite.config.ts'),
+    server: {
+      port: 8080
+    }
   });
 
-  await server.listen();
+  await server.listen(8080);
   return server;
 }
 
