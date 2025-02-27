@@ -191,7 +191,7 @@ const Index = () => {
         {/* Hero Section */}
         <section className="text-center space-y-4 animate-fadeIn">
           <h1 className="text-4xl md:text-5xl font-bold text-gray-900">
-            Welcome to WatchOut
+            Course Correct
           </h1>
           <p className="text-lg md:text-xl text-gray-600 max-w-3xl mx-auto">
             Stay focused and productive with intelligent reminders that keep you on track. 

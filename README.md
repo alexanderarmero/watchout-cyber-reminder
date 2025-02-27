@@ -100,21 +100,6 @@ The built applications will be available in the `release` directory:
 3. Make it executable: `chmod +x <filename>.AppImage`
 4. Run it: `./<filename>.AppImage`
 
-## What technologies are used for this project?
-
-This project is built with:
-
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
-- Electron
-
-## How can I deploy this project?
-
-Simply open [Lovable](https://lovable.dev/projects/f24d296f-1762-4d19-b54d-56c3fa337e8c) and click on Share -> Publish.
-
 ## I want to use a custom domain - is that possible?
 
 We don't support custom domains (yet). If you want to deploy your project under your own domain then we recommend using Netlify. Visit our docs for more details: [Custom domains](https://docs.lovable.dev/tips-tricks/custom-domain/)
