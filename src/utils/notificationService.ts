@@ -1,4 +1,6 @@
+
 import { Reminder, FrequencyType } from "@/types/reminder";
+import { deleteReminder } from "./reminderUtils";
 
 class NotificationService {
   private timeouts: Map<string, NodeJS.Timeout> = new Map();
@@ -20,7 +22,9 @@ class NotificationService {
 
   private calculateNextTrigger(frequency: FrequencyType): number {
     if (frequency.type === "oneTime") {
-      return new Date(frequency.value).getTime() - Date.now();
+      const targetTime = new Date(frequency.value).getTime();
+      const currentTime = Date.now();
+      return Math.max(0, targetTime - currentTime); // Ensure non-negative delay
     }
 
     // Handle recurring frequencies
@@ -47,23 +51,33 @@ class NotificationService {
         milliseconds = 24 * 60 * 60 * 1000; // 24 hours
         break;
       default:
-        milliseconds = 30 * 1000; // Default to 30 seconds for testing
+        milliseconds = 30 * 1000; // Default to 30 seconds
     }
 
     return milliseconds;
   }
 
-  private showNotification(reminder: Reminder) {
+  private async showNotification(reminder: Reminder) {
     if (Notification.permission === "granted") {
       console.log(`Showing notification for reminder: ${reminder.title}`);
       new Notification(reminder.title, {
         body: reminder.description,
+        icon: "/favicon.ico",
         silent: false,
         requireInteraction: true // Makes the notification stay until user interacts with it
       });
 
-      // If it's a recurring reminder, schedule the next one
-      if (reminder.frequency.type === "recurring") {
+      // If it's a one-time reminder, delete it after it's shown
+      if (reminder.frequency.type === "oneTime") {
+        console.log(`One-time reminder triggered: ${reminder.title}. Deleting...`);
+        // Remove it from our tracking
+        this.clearNotification(reminder.id);
+        // Delete from storage and state
+        await deleteReminder(reminder.id);
+        // Refresh the page to update UI
+        window.location.reload();
+      } else if (reminder.frequency.type === "recurring") {
+        // If it's a recurring reminder, schedule the next one
         console.log(`Scheduling next notification for recurring reminder: ${reminder.title}`);
         this.scheduleNotification(reminder);
       }
@@ -79,13 +93,14 @@ class NotificationService {
     }
 
     const delay = this.calculateNextTrigger(reminder.frequency);
-    console.log(`Scheduling notification for "${reminder.title}" in ${delay/1000} seconds`);
-
+    
     // Don't schedule if delay is negative (past time for one-time reminders)
-    if (delay < 0 && reminder.frequency.type === "oneTime") {
+    if (delay <= 0 && reminder.frequency.type === "oneTime") {
       console.warn(`Skipping past-due one-time reminder: ${reminder.title}`);
       return;
     }
+
+    console.log(`Scheduling notification for "${reminder.title}" in ${Math.floor(delay/1000)} seconds (${reminder.frequency.type})`);
 
     const timeout = setTimeout(() => {
       this.showNotification(reminder);

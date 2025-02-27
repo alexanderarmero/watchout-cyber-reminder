@@ -1,3 +1,4 @@
+
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
@@ -7,6 +8,12 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Reminder } from "@/types/reminder";
+import { useState } from "react";
+import { Calendar } from "@/components/ui/calendar";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { CalendarIcon, Clock } from "lucide-react";
+import { cn } from "@/lib/utils";
+import { format } from "date-fns";
 
 const formSchema = z.object({
   title: z.string().min(1, "Title is required"),
@@ -23,6 +30,10 @@ interface NewReminderFormProps {
 }
 
 export function NewReminderForm({ onSubmit }: NewReminderFormProps) {
+  const [frequencyType, setFrequencyType] = useState<"recurring" | "oneTime">("recurring");
+  const [date, setDate] = useState<Date | undefined>(new Date());
+  const [time, setTime] = useState<string>("12:00");
+
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -36,6 +47,104 @@ export function NewReminderForm({ onSubmit }: NewReminderFormProps) {
     },
   });
 
+  const handleFrequencyChange = (value: string) => {
+    const [type, val] = value.split(":");
+    
+    if (type === "oneTime" && val === "custom") {
+      // For custom date/time
+      setFrequencyType("oneTime");
+      const selectedDateTime = combineDateTime();
+      const formattedDate = format(selectedDateTime, "PPP");
+      const formattedTime = format(selectedDateTime, "p");
+      
+      form.setValue("frequency", {
+        type: "oneTime",
+        value: selectedDateTime.toISOString(),
+        label: `${formattedDate} at ${formattedTime}`,
+      });
+    } else {
+      // For recurring frequencies
+      setFrequencyType("recurring");
+      const label = {
+        "30s": "Every 30 seconds",
+        "60s": "Every minute",
+        "30min": "Every 30 minutes",
+        "1h": "Every hour",
+        "12h": "Every 12 hours",
+        "24h": "Every 24 hours",
+      }[val] || "Custom time";
+
+      form.setValue("frequency", {
+        type: "recurring",
+        value: val,
+        label,
+      });
+    }
+  };
+
+  const handleDateChange = (newDate: Date | undefined) => {
+    setDate(newDate);
+    updateCustomDateTime(newDate, time);
+  };
+
+  const handleTimeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const newTime = e.target.value;
+    setTime(newTime);
+    updateCustomDateTime(date, newTime);
+  };
+
+  const updateCustomDateTime = (selectedDate?: Date, selectedTime?: string) => {
+    if (selectedDate && selectedTime) {
+      const dateTime = new Date(selectedDate);
+      const [hours, minutes] = selectedTime.split(':').map(Number);
+      dateTime.setHours(hours, minutes, 0, 0);
+      
+      const formattedDate = format(dateTime, "PPP");
+      const formattedTime = format(dateTime, "p");
+      
+      form.setValue("frequency", {
+        type: "oneTime",
+        value: dateTime.toISOString(),
+        label: `${formattedDate} at ${formattedTime}`,
+      });
+    }
+  };
+
+  const combineDateTime = (): Date => {
+    const combined = new Date(date || new Date());
+    const [hours, minutes] = time.split(':').map(Number);
+    combined.setHours(hours, minutes, 0, 0);
+    return combined;
+  };
+
+  const handleFormSubmit = (values: z.infer<typeof formSchema>) => {
+    // If it's a custom date/time, make sure we have the latest values
+    if (frequencyType === "oneTime" && values.frequency.value.includes("custom")) {
+      const selectedDateTime = combineDateTime();
+      values.frequency.value = selectedDateTime.toISOString();
+      
+      const formattedDate = format(selectedDateTime, "PPP");
+      const formattedTime = format(selectedDateTime, "p");
+      values.frequency.label = `${formattedDate} at ${formattedTime}`;
+    }
+    
+    onSubmit(values);
+    
+    // Reset the form
+    form.reset({
+      title: "",
+      description: "",
+      frequency: {
+        type: "recurring",
+        value: "30s",
+        label: "Every 30 seconds",
+      },
+    });
+    setFrequencyType("recurring");
+    setDate(new Date());
+    setTime("12:00");
+  };
+
   return (
     <Card className="bg-blue-50/50 border border-blue-100 hover:shadow-md transition-shadow">
       <CardHeader>
@@ -46,7 +155,7 @@ export function NewReminderForm({ onSubmit }: NewReminderFormProps) {
       </CardHeader>
       <CardContent>
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+          <form onSubmit={form.handleSubmit(handleFormSubmit)} className="space-y-6">
             <FormField
               control={form.control}
               name="title"
@@ -90,23 +199,7 @@ export function NewReminderForm({ onSubmit }: NewReminderFormProps) {
                 <FormItem>
                   <FormLabel className="text-gray-700">Frequency</FormLabel>
                   <Select
-                    onValueChange={(value) => {
-                      const [type, val] = value.split(":");
-                      const label = {
-                        "30s": "Every 30 seconds",
-                        "60s": "Every minute",
-                        "30min": "Every 30 minutes",
-                        "1h": "Every hour",
-                        "12h": "Every 12 hours",
-                        "24h": "Every 24 hours",
-                      }[val] || "Custom time";
-
-                      field.onChange({
-                        type,
-                        value: val,
-                        label,
-                      });
-                    }}
+                    onValueChange={handleFrequencyChange}
                     defaultValue="recurring:30s"
                   >
                     <FormControl>
@@ -121,12 +214,57 @@ export function NewReminderForm({ onSubmit }: NewReminderFormProps) {
                       <SelectItem value="recurring:1h">Every hour</SelectItem>
                       <SelectItem value="recurring:12h">Every 12 hours</SelectItem>
                       <SelectItem value="recurring:24h">Every 24 hours</SelectItem>
+                      <SelectItem value="oneTime:custom">Custom date & time</SelectItem>
                     </SelectContent>
                   </Select>
                   <FormMessage className="text-red-600" />
                 </FormItem>
               )}
             />
+
+            {frequencyType === "oneTime" && (
+              <div className="grid gap-4">
+                <div>
+                  <FormLabel className="text-gray-700">Date</FormLabel>
+                  <Popover>
+                    <PopoverTrigger asChild>
+                      <Button
+                        variant="outline"
+                        className={cn(
+                          "w-full pl-3 text-left font-normal bg-white border-blue-100",
+                          !date && "text-muted-foreground"
+                        )}
+                      >
+                        {date ? format(date, "PPP") : "Select date"}
+                        <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+                      </Button>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-auto p-0" align="start">
+                      <Calendar
+                        mode="single"
+                        selected={date}
+                        onSelect={handleDateChange}
+                        disabled={(date) => date < new Date(new Date().setHours(0, 0, 0, 0))}
+                        initialFocus
+                      />
+                    </PopoverContent>
+                  </Popover>
+                </div>
+                
+                <div>
+                  <FormLabel className="text-gray-700">Time</FormLabel>
+                  <div className="flex items-center space-x-2">
+                    <Clock className="h-4 w-4 text-gray-500" />
+                    <Input
+                      type="time"
+                      value={time}
+                      onChange={handleTimeChange}
+                      className="bg-white border-blue-100 focus:border-blue-200 focus:ring-blue-100"
+                    />
+                  </div>
+                </div>
+              </div>
+            )}
 
             <Button 
               type="submit" 
