@@ -2,20 +2,34 @@
 import { useState, useEffect } from "react";
 import { ReminderCard } from "@/components/ReminderCard";
 import { NewReminderForm } from "@/components/NewReminderForm";
-import { getReminders, addReminder, deleteReminder } from "@/utils/reminderUtils";
+import { 
+  getReminders, 
+  addReminder, 
+  deleteReminder, 
+  saveReminderToLibrary, 
+  getReminderLibrary, 
+  removeReminderFromLibrary,
+  activateReminderFromLibrary 
+} from "@/utils/reminderUtils";
 import { Reminder } from "@/types/reminder";
 import { useToast } from "@/components/ui/use-toast";
 import notificationService from "@/utils/notificationService";
 import { Button } from "@/components/ui/button";
 import { Github } from "lucide-react";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 const Index = () => {
   const [reminders, setReminders] = useState<Reminder[]>([]);
+  const [savedReminders, setSavedReminders] = useState<Reminder[]>([]);
+  const [activeTab, setActiveTab] = useState<string>("active");
   const { toast } = useToast();
 
   useEffect(() => {
     const loadedReminders = getReminders();
     setReminders(loadedReminders);
+    
+    const loadedSavedReminders = getReminderLibrary();
+    setSavedReminders(loadedSavedReminders);
     
     loadedReminders.forEach(reminder => {
       notificationService.scheduleNotification(reminder);
@@ -43,6 +57,41 @@ const Index = () => {
     toast({
       title: "Reminder deleted",
       description: "The reminder has been removed successfully.",
+    });
+  };
+
+  const handleSaveToLibrary = async (id: string) => {
+    const savedReminder = await saveReminderToLibrary(id);
+    if (savedReminder) {
+      setSavedReminders((prev) => [...prev, savedReminder]);
+      toast({
+        title: "Reminder saved",
+        description: "Your reminder has been saved to the library.",
+      });
+    }
+  };
+
+  const handleDeleteFromLibrary = async (id: string) => {
+    await removeReminderFromLibrary(id);
+    setSavedReminders((prev) => prev.filter((reminder) => reminder.id !== id));
+    toast({
+      title: "Removed from library",
+      description: "The reminder has been removed from your library.",
+    });
+  };
+
+  const handleActivateFromLibrary = async (reminder: Reminder) => {
+    await activateReminderFromLibrary(reminder);
+    setReminders((prev) => {
+      if (prev.some(r => r.id === reminder.id)) {
+        return prev;
+      }
+      return [...prev, reminder];
+    });
+    notificationService.scheduleNotification(reminder);
+    toast({
+      title: "Reminder activated",
+      description: "The saved reminder has been activated.",
     });
   };
 
@@ -120,18 +169,63 @@ const Index = () => {
 
         {/* Main Content */}
         <div className="grid md:grid-cols-2 gap-8">
-          {/* Reminders List */}
+          {/* Reminders List with Tabs */}
           <section className="space-y-6">
-            <h2 className="text-2xl font-semibold text-gray-800">Your Reminders</h2>
-            <div className="space-y-4">
-              {reminders.map((reminder) => (
-                <ReminderCard 
-                  key={reminder.id} 
-                  {...reminder} 
-                  onDelete={handleDeleteReminder}
-                />
-              ))}
-            </div>
+            <Tabs defaultValue="active" onValueChange={setActiveTab} value={activeTab}>
+              <div className="flex justify-between items-center mb-4">
+                <h2 className="text-2xl font-semibold text-gray-800">Your Reminders</h2>
+                <TabsList className="bg-cyberpunk-dark/20">
+                  <TabsTrigger 
+                    value="active"
+                    className="data-[state=active]:bg-cyberpunk-purple data-[state=active]:text-white"
+                  >
+                    Active
+                  </TabsTrigger>
+                  <TabsTrigger 
+                    value="saved"
+                    className="data-[state=active]:bg-cyberpunk-purple data-[state=active]:text-white"
+                  >
+                    Saved Library
+                  </TabsTrigger>
+                </TabsList>
+              </div>
+              
+              <TabsContent value="active" className="space-y-4 mt-0">
+                {reminders.length === 0 ? (
+                  <div className="text-center text-gray-500 py-8">
+                    <p>No active reminders. Create one to get started!</p>
+                  </div>
+                ) : (
+                  reminders.map((reminder) => (
+                    <ReminderCard 
+                      key={reminder.id} 
+                      {...reminder} 
+                      onDelete={handleDeleteReminder}
+                      onSaveToLibrary={handleSaveToLibrary}
+                    />
+                  ))
+                )}
+              </TabsContent>
+              
+              <TabsContent value="saved" className="space-y-4 mt-0">
+                {savedReminders.length === 0 ? (
+                  <div className="text-center text-gray-500 py-8">
+                    <p>No saved reminders in your library yet.</p>
+                    <p className="mt-2">Click the bookmark icon on a reminder to save it here.</p>
+                  </div>
+                ) : (
+                  savedReminders.map((reminder) => (
+                    <ReminderCard 
+                      key={reminder.id} 
+                      {...reminder} 
+                      onDelete={handleDeleteFromLibrary}
+                      onActivate={handleActivateFromLibrary}
+                      isSavedView={true}
+                    />
+                  ))
+                )}
+              </TabsContent>
+            </Tabs>
           </section>
 
           {/* New Reminder Form */}
