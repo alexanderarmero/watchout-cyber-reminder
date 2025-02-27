@@ -16,6 +16,7 @@ export const ReminderCard = ({
   title, 
   description, 
   frequency, 
+  createdAt,
   onDelete, 
   onSaveToLibrary, 
   onActivate,

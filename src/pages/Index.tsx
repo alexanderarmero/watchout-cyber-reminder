@@ -63,7 +63,13 @@ const Index = () => {
   const handleSaveToLibrary = async (id: string) => {
     const savedReminder = await saveReminderToLibrary(id);
     if (savedReminder) {
-      setSavedReminders((prev) => [...prev, savedReminder]);
+      setSavedReminders((prev) => {
+        // Check if this reminder is already in the saved list
+        if (prev.some(r => r.id === id)) {
+          return prev;
+        }
+        return [...prev, savedReminder];
+      });
       toast({
         title: "Reminder saved",
         description: "Your reminder has been saved to the library.",
@@ -81,17 +87,25 @@ const Index = () => {
   };
 
   const handleActivateFromLibrary = async (reminder: Reminder) => {
-    await activateReminderFromLibrary(reminder);
+    const activatedReminder = await activateReminderFromLibrary(reminder);
+    
+    // Update UI to include the activated reminder in the active list
     setReminders((prev) => {
       if (prev.some(r => r.id === reminder.id)) {
         return prev;
       }
       return [...prev, reminder];
     });
+    
+    // Schedule notification for the activated reminder
     notificationService.scheduleNotification(reminder);
+    
+    // Switch to the active tab
+    setActiveTab("active");
+    
     toast({
       title: "Reminder activated",
-      description: "The saved reminder has been activated.",
+      description: "The saved reminder has been activated and scheduled.",
     });
   };
 
