@@ -1,4 +1,3 @@
-
 import { Reminder, FrequencyType } from "@/types/reminder";
 
 class NotificationService {
@@ -59,7 +58,6 @@ class NotificationService {
       console.log(`Showing notification for reminder: ${reminder.title}`);
       new Notification(reminder.title, {
         body: reminder.description,
-        icon: "/favicon.ico",
         silent: false,
         requireInteraction: true // Makes the notification stay until user interacts with it
       });

@@ -1,134 +1,142 @@
-
-import { useState } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
+import * as z from "zod";
 import { Button } from "@/components/ui/button";
-import { Label } from "@/components/ui/label";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { FrequencyType } from "@/types/reminder";
+import { Reminder } from "@/types/reminder";
 
-const FREQUENCY_OPTIONS: { value: string; label: string; type: 'recurring' | 'oneTime' }[] = [
-  { value: "30s", label: "Every 30 seconds", type: "recurring" },
-  { value: "60s", label: "Every 60 seconds", type: "recurring" },
-  { value: "30min", label: "Every 30 minutes", type: "recurring" },
-  { value: "1h", label: "Every hour", type: "recurring" },
-  { value: "12h", label: "Every 12 hours", type: "recurring" },
-  { value: "24h", label: "Daily", type: "recurring" },
-  { value: "custom", label: "Custom time", type: "oneTime" },
-];
+const formSchema = z.object({
+  title: z.string().min(1, "Title is required"),
+  description: z.string().min(1, "Description is required"),
+  frequency: z.object({
+    type: z.enum(["oneTime", "recurring"]),
+    value: z.string(),
+    label: z.string(),
+  }),
+});
 
 interface NewReminderFormProps {
-  onSubmit: (data: { title: string; description: string; frequency: FrequencyType }) => void;
+  onSubmit: (data: Pick<Reminder, "title" | "description" | "frequency">) => void;
 }
 
-export const NewReminderForm = ({ onSubmit }: NewReminderFormProps) => {
-  const [title, setTitle] = useState("");
-  const [description, setDescription] = useState("");
-  const [frequency, setFrequency] = useState("");
-  const [customDateTime, setCustomDateTime] = useState("");
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    const selectedFrequency = FREQUENCY_OPTIONS.find((option) => option.value === frequency);
-    if (selectedFrequency && title && description) {
-      onSubmit({
-        title,
-        description,
-        frequency: {
-          type: selectedFrequency.type,
-          value: selectedFrequency.type === "oneTime" ? customDateTime : selectedFrequency.value,
-          label: selectedFrequency.type === "oneTime" 
-            ? `One time at ${new Date(customDateTime).toLocaleString()}`
-            : selectedFrequency.label,
-        },
-      });
-      setTitle("");
-      setDescription("");
-      setFrequency("");
-      setCustomDateTime("");
-    }
-  };
-
-  const isFormValid = () => {
-    if (!title || !description || !frequency) return false;
-    if (frequency === "custom") {
-      return !!customDateTime;
-    }
-    return true;
-  };
+export function NewReminderForm({ onSubmit }: NewReminderFormProps) {
+  const form = useForm<z.infer<typeof formSchema>>({
+    resolver: zodResolver(formSchema),
+    defaultValues: {
+      title: "",
+      description: "",
+      frequency: {
+        type: "recurring",
+        value: "30s",
+        label: "Every 30 seconds",
+      },
+    },
+  });
 
   return (
-    <Card className="bg-cyberpunk-dark/80 border-2 border-black backdrop-blur-sm">
+    <Card className="bg-blue-50/50 border border-blue-100 hover:shadow-md transition-shadow">
       <CardHeader>
-        <CardTitle className="text-xl font-semibold text-white">Create New Reminder</CardTitle>
+        <CardTitle className="text-lg font-semibold text-gray-900">Create New Reminder</CardTitle>
+        <CardDescription className="text-gray-600">
+          Set up a new reminder with custom timing.
+        </CardDescription>
       </CardHeader>
       <CardContent>
-        <form onSubmit={handleSubmit} className="space-y-6">
-          <div className="space-y-2">
-            <Label htmlFor="title" className="text-white">Title</Label>
-            <Input
-              id="title"
-              value={title}
-              onChange={(e) => setTitle(e.target.value)}
-              className="bg-cyberpunk-dark/60 border-black border-2 text-white"
-              placeholder="Enter reminder title"
+        <Form {...form}>
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+            <FormField
+              control={form.control}
+              name="title"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="text-gray-700">Title</FormLabel>
+                  <FormControl>
+                    <Input 
+                      placeholder="Enter reminder title" 
+                      {...field} 
+                      className="bg-white border-blue-100 focus:border-blue-200 focus:ring-blue-100"
+                    />
+                  </FormControl>
+                  <FormMessage className="text-red-600" />
+                </FormItem>
+              )}
             />
-          </div>
-          
-          <div className="space-y-2">
-            <Label htmlFor="description" className="text-white">Description</Label>
-            <Input
-              id="description"
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
-              className="bg-cyberpunk-dark/60 border-black border-2 text-white"
-              placeholder="Enter reminder description"
-            />
-          </div>
 
-          <div className="space-y-2">
-            <Label htmlFor="frequency" className="text-white">Frequency</Label>
-            <Select onValueChange={setFrequency} value={frequency}>
-              <SelectTrigger className="bg-cyberpunk-dark/60 border-black border-2 text-white">
-                <SelectValue placeholder="Select frequency" />
-              </SelectTrigger>
-              <SelectContent className="bg-cyberpunk-dark border-black border-2">
-                {FREQUENCY_OPTIONS.map((option) => (
-                  <SelectItem
-                    key={option.value}
-                    value={option.value}
-                    className="text-white hover:bg-cyberpunk-purple/20"
+            <FormField
+              control={form.control}
+              name="description"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="text-gray-700">Description</FormLabel>
+                  <FormControl>
+                    <Input 
+                      placeholder="Enter reminder description" 
+                      {...field} 
+                      className="bg-white border-blue-100 focus:border-blue-200 focus:ring-blue-100"
+                    />
+                  </FormControl>
+                  <FormMessage className="text-red-600" />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="frequency"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="text-gray-700">Frequency</FormLabel>
+                  <Select
+                    onValueChange={(value) => {
+                      const [type, val] = value.split(":");
+                      const label = {
+                        "30s": "Every 30 seconds",
+                        "60s": "Every minute",
+                        "30min": "Every 30 minutes",
+                        "1h": "Every hour",
+                        "12h": "Every 12 hours",
+                        "24h": "Every 24 hours",
+                      }[val] || "Custom time";
+
+                      field.onChange({
+                        type,
+                        value: val,
+                        label,
+                      });
+                    }}
+                    defaultValue="recurring:30s"
                   >
-                    {option.label}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
+                    <FormControl>
+                      <SelectTrigger className="bg-white border-blue-100 focus:border-blue-200 focus:ring-blue-100">
+                        <SelectValue placeholder="Select frequency" />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      <SelectItem value="recurring:30s">Every 30 seconds</SelectItem>
+                      <SelectItem value="recurring:60s">Every minute</SelectItem>
+                      <SelectItem value="recurring:30min">Every 30 minutes</SelectItem>
+                      <SelectItem value="recurring:1h">Every hour</SelectItem>
+                      <SelectItem value="recurring:12h">Every 12 hours</SelectItem>
+                      <SelectItem value="recurring:24h">Every 24 hours</SelectItem>
+                    </SelectContent>
+                  </Select>
+                  <FormMessage className="text-red-600" />
+                </FormItem>
+              )}
+            />
 
-          {frequency === "custom" && (
-            <div className="space-y-2">
-              <Label htmlFor="customDateTime" className="text-white">Reminder Date & Time</Label>
-              <Input
-                id="customDateTime"
-                type="datetime-local"
-                value={customDateTime}
-                onChange={(e) => setCustomDateTime(e.target.value)}
-                className="bg-cyberpunk-dark/60 border-black border-2 text-white"
-                min={new Date().toISOString().slice(0, 16)}
-              />
-            </div>
-          )}
-
-          <Button
-            type="submit"
-            className="w-full bg-cyberpunk-purple hover:bg-cyberpunk-purple/90 text-white"
-            disabled={!isFormValid()}
-          >
-            Create Reminder
-          </Button>
-        </form>
+            <Button 
+              type="submit" 
+              className="w-full bg-blue-500/10 hover:bg-blue-500/20 text-blue-700"
+            >
+              Create Reminder
+            </Button>
+          </form>
+        </Form>
       </CardContent>
     </Card>
   );
-};
+}
