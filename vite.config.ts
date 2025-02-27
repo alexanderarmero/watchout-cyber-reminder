@@ -13,8 +13,9 @@ export default defineConfig({
   },
   // Ensure proper base path for Electron
   base: process.env.ELECTRON === 'true' ? './' : '/',
-  // Don't open browser when running dev server
+  // Configure server with the required port 8080
   server: {
+    port: 8080,
     open: false
   }
 })

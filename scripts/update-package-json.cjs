@@ -1,11 +1,6 @@
 
-import fs from 'fs';
-import path from 'path';
-import { fileURLToPath } from 'url';
-
-// Get the directory name in ES modules
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
+const fs = require('fs');
+const path = require('path');
 
 // Read the current package.json
 const packageJsonPath = path.join(__dirname, '../package.json');
@@ -13,7 +8,7 @@ const packageJson = JSON.parse(fs.readFileSync(packageJsonPath, 'utf8'));
 
 // Add Electron-related scripts
 const electronScripts = {
-  "electron:dev": "node scripts/dev-electron.js",
+  "electron:dev": "node scripts/dev-electron.cjs",
   "electron:build": "npm run build && tsc -p electron/tsconfig.json && electron-builder",
   "electron:build:mac": "npm run build && tsc -p electron/tsconfig.json && electron-builder --mac",
   "electron:build:win": "npm run build && tsc -p electron/tsconfig.json && electron-builder --win",
